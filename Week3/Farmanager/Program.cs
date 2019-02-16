@@ -14,27 +14,27 @@ namespace FarManager2
         {
             get
             {
-                return selectedItem;
+                return selectedItem;//property for getting selected item
             }
             set
             {
                 if (value >= Content.Count)
                 {
-                    selectedItem = 0;
+                    selectedItem = 0;//novigation if you in the end of directories you will return to up
                 }
                 else if (value < 0)
                 {
-                    selectedItem = Content.Count - 1;
+                    selectedItem = Content.Count - 1;//if you at the top you will return to down
                 }
                 else
                 {
-                    selectedItem = value;
+                    selectedItem = value;//just novigation
                 }
             }
         }
 
 
-        public List<FileSystemInfo> Content
+        public List<FileSystemInfo> Content// method for content
         {
             get;
             set;
@@ -61,7 +61,7 @@ namespace FarManager2
             }
             else
             {
-                FileInfo y = fInfo as FileInfo; // sme wirth file
+                FileInfo y = fInfo as FileInfo; // creatin class fileinfo
                 for (int i = 1; i <= 2; i++) // creating space for writing name from console
                 {
                     Console.WriteLine();
@@ -72,57 +72,57 @@ namespace FarManager2
                 }
                 Console.Write("Enter new name:"); //writing in console for user 
 
-                string s = Console.ReadLine();
+                string s = Console.ReadLine();//reading from console
                 string newname = Path.Combine(y.Directory.FullName, s);
-                y.MoveTo(newname);
+                y.MoveTo(newname);//renaming to ne name
             }
         }
 
 
-        public void DeleteSelectedItem()
+        public void DeleteSelectedItem()//method for deleting files
         {
             FileSystemInfo fileSystemInfo = Content[selectedItem];
             if (fileSystemInfo.GetType() == typeof(DirectoryInfo))
             {
-                Directory.Delete(fileSystemInfo.FullName, true);
+                Directory.Delete(fileSystemInfo.FullName, true);//deletes directory
             }
             else
             {
-                File.Delete(fileSystemInfo.FullName);
+                File.Delete(fileSystemInfo.FullName);//deletes file
             }
-            Content.RemoveAt(selectedItem);
-            selectedItem--;
+            Content.RemoveAt(selectedItem);//remove item
+            selectedItem--;//makes interface after deleting file(directory)
         }
-        public void Draw()
+        public void Draw()//method ofr visualization
         {
-            Console.BackgroundColor = ConsoleColor.Black;
+            Console.BackgroundColor = ConsoleColor.Black;//in interface background will be color
             Console.Clear();
             for (int i = 0; i < Content.Count; ++i)
             {
                 if (i == SelectedItem)
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.BackgroundColor = ConsoleColor.Red;//selected item will be red color
                 }
                 else
                 {
-                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.BackgroundColor = ConsoleColor.Black;//if it is not selected it is as background black
                 }
-                Console.WriteLine((i+1)+". "+Content[i].Name);
+                Console.WriteLine((i + 1) + ". " + Content[i].Name);//shows items(files and directory) in console(EX. 1. PP2)
             }
         }
     }
-    enum FARMode
+    enum FARMode//declare an enumeration
     {
-        DIR,
-        FILE
+        DIR,//directory
+        FILE//files
     }
     class Program
     {
         static void Main(string[] args)
         {
             FARMode mode = FARMode.DIR;
-            DirectoryInfo root = new DirectoryInfo(@"C:/Users/User/test2");
-            Stack<Layer> history = new Stack<Layer>();
+            DirectoryInfo root = new DirectoryInfo(@"C:/Users/User/test2");//directory which showed
+            Stack<Layer> history = new Stack<Layer>();//by stack princep last in first out
             history.Push(
                     new Layer
                     {
@@ -131,30 +131,30 @@ namespace FarManager2
                     }
                 );
             while (true)
-                            {
+            {
                 if (mode == FARMode.DIR)
                 {
                     history.Peek().Draw();
                 }
                 ConsoleKeyInfo consoleKeyInfo = Console.ReadKey();
-                switch (consoleKeyInfo.Key)
+                switch (consoleKeyInfo.Key)//controling by keybord
                 {
-                    case ConsoleKey.Delete:
-                        history.Peek().DeleteSelectedItem();
+                    case ConsoleKey.Delete://key delete
+                        history.Peek().DeleteSelectedItem();//deletes directory or file
                         break;
-                    case ConsoleKey.UpArrow:
-                        history.Peek().SelectedItem--;
+                    case ConsoleKey.UpArrow://arraw up
+                        history.Peek().SelectedItem--;//novigation to up of list
                         break;
-                    case ConsoleKey.DownArrow:
-                        history.Peek().SelectedItem++;
+                    case ConsoleKey.DownArrow://arrow down
+                        history.Peek().SelectedItem++;//novigation to down of list
                         break;
                     case ConsoleKey.F2: // console key for renaming
                         history.Peek().Rename(history.Peek().Content[history.Peek().SelectedItem]);
-                        break;
-                    case ConsoleKey.Backspace:
+                        break;//renames file or directory
+                    case ConsoleKey.Backspace://key backspase
                         if (mode == FARMode.DIR)
                         {
-                            history.Pop();
+                            history.Pop();//novigation to privews directory
                         }
                         else
                         {
@@ -162,28 +162,28 @@ namespace FarManager2
                             Console.ForegroundColor = ConsoleColor.White;
                         }
                         break;
-                    case ConsoleKey.Enter:
+                    case ConsoleKey.Enter://selecting file or directory
                         int x = history.Peek().SelectedItem;
                         FileSystemInfo fileSystemInfo = history.Peek().Content[x];
-                        if (fileSystemInfo.GetType() == typeof(DirectoryInfo))
+                        if (fileSystemInfo.GetType() == typeof(DirectoryInfo))//if selected item is directory
                         {
                             DirectoryInfo directoryInfo = fileSystemInfo as DirectoryInfo;
                             history.Push(
                                new Layer
-                              {
+                               {
                                    Content = directoryInfo.GetFileSystemInfos().ToList(),
                                    SelectedItem = 0
-                               });
+                               });//novigation by directory
                         }
                         else
                         {
-                            mode = FARMode.FILE;
-                            Console.BackgroundColor = ConsoleColor.White;
+                            mode = FARMode.FILE;//if it is file
+                            Console.BackgroundColor = ConsoleColor.White;//background of file
                             Console.Clear();
-                            Console.ForegroundColor = ConsoleColor.Black;
-                            using (StreamReader sr = new StreamReader(fileSystemInfo.FullName))
+                            Console.ForegroundColor = ConsoleColor.Black;//foreground of file
+                            using (StreamReader sr = new StreamReader(fileSystemInfo.FullName))//reads selected item
                             {
-                                Console.WriteLine(sr.ReadToEnd());
+                                Console.WriteLine(sr.ReadToEnd());//readsallfile
                             }
                         }
                         break;
